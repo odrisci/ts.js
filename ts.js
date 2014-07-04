@@ -1,7 +1,13 @@
-/*! ts v0.0.0 - 2014-07-02 
+/*! ts v0.0.0 - 2014-07-04 
  * License: MIT */
 (function(exports){
   var ts = exports.ts = { version : '0.0.0' };
+
+  function ts_sortTimeSeriesArray( arr ){
+    return arr.sort( function( a, b ){
+      return a[0] - b[0];
+    });
+  }
 
   // Creates a new timeseries object
   ts.timeSeries = function(){
@@ -30,6 +36,8 @@
             return timeSeries;
           }
         }
+
+        ts_sortTimeSeriesArray( odata );
       }
       else{
         alert( 'input must be a timeSeries or an array of [timestamp, value] pairs' );
@@ -40,37 +48,79 @@
         return timeSeries;
       }
 
-      // Ok here we have odata and data, find where one can be inserted into the other
-      // Algorithm:
-      //  consider odata[j]
-      //    find i, index of first element in data such that data[i][0] > data[j][0]
-      //    find k, index of first element in odata such that data[i][0]  odata[k][0]
-      i = data.length;
-      var j = 0;
+/*
+      // Simpler idea:
+      var args = [ data.length, 0 ].concat( odata );
+      Array.prototype.splice.apply( data, args );
 
-      //
-      while( i > 1 && data[i-1][0] > odata[0][0] ){
-        i--;
-      }
+      ts_sortTimeSeriesArray( data );
+*/
+      // Utility function
+      var firstIndexGreaterThan = function( timeSeries, timeStamp, start ){
+        if( timeSeries.length === 0 ){
+          return 0;
+        }
+
+        var stop = timeSeries.length-1, t0, t1, tGuess;
+
+        if( start === undefined ) start = 0;
+
+        t0 = timeSeries[start][0];
+        t1 = timeSeries[stop][0];
+
+
+        if( timeStamp < t0 ){
+          return start;
+        }
+
+        if( timeStamp > t1 ){
+          return timeSeries.length;
+        }
+
+        var guess;
+
+        while( start < stop - 1 ){
+
+          guess = Math.floor( (start+stop)/2 );
+
+          tGuess = timeSeries[guess][0];
+
+          if( tGuess > timeStamp ){
+            stop = guess;
+          }
+          else{
+            start = guess;
+          }
+
+          t0 = timeSeries[start][0];
+          t1 = timeSeries[stop][0];
+
+        }
+
+        return stop;
+
+      };
+
+      var j = 0,
+          k = 0,
+          args;
+
+      i = 0;
 
       while( j < odata.length ){
-        var k = odata.length;
 
-        while( i < data.length && data[i][0] <= odata[j][0] ){
-          ++i;
+        // Now find i: the first index in data which is greater than the first element in odata
+        i = firstIndexGreaterThan( data, odata[j][0], i );
+
+        if( i == data.length ){
+          args = [i, 0].concat( odata.slice(j) );
+          Array.prototype.splice.apply( data, args );
+          break;
         }
 
-        if( i < data.length ){
-          while( k > j && data[i][0] < odata[k-1][0] ){
-            k--;
-          }
-        }
-
-        // To splice an array into another array you need to do the following
-        var args = [i, 0].concat( odata.slice(j,k) );
+        k = firstIndexGreaterThan( odata, data[i][0], j );
+        args = [i,0].concat( odata.slice(j,k) );
         Array.prototype.splice.apply( data, args );
-        // The below does not work:
-        //data.splice( i, 0, odata.slice(j,k) );
 
         j = k;
 
@@ -88,7 +138,7 @@
       var i = data.length - 1;
 
       if( i < 0 ){
-        data.push( timeStamp, value );
+        data.push( [timeStamp, value] );
         return this;
       }
 
@@ -118,14 +168,64 @@
       if( data.length === 0 )
         return [];
 
-      var sdata = data.slice();
+      var start = 0,
+          stop = data.length-1,
+          guess,
+          t0 = data[start][0],
+          t1 = data[stop][0],
+          i = 0;
 
-      sdata.sort( function(a,b){
-        return ( Math.abs( a[0] - timeStamp ) - Math.abs( b[0] - timeStamp ) );
-      });
+      if( t0 >= timeStamp ){
+        return data[start];
+      }
 
-      return sdata[0];
+      if( t1 <= timeStamp ){
+        return data[stop];
+      }
 
+      while( start < stop - 1 ){
+
+        guess = Math.floor( (start+stop)/2 );
+
+        if( data[guess][0] > timeStamp ){
+          stop = guess;
+        }
+        else{
+          start = guess;
+        }
+
+        t0 = data[start][0];
+        t1 = data[stop][0];
+
+        if( ++i > data.length/2 ){
+          console.log( 'Aaarggh!' );
+          break;
+        }
+
+      }
+
+      if( Math.abs(timeStamp - t0) > Math.abs(timeStamp - t1) ){
+        guess = stop;
+      }
+      else{
+        guess = start;
+      }
+
+      return data[guess];
+      /*
+
+      var sdata = data.map( function(a){ return Math.abs( a[0] - timeStamp ); } );
+
+      var minVal = sdata[0], minIdx = 0;
+      for( var i = 1; i < sdata.length; ++i ){
+        if( sdata[i] < minVal ){
+          minIdx = i;
+          minVal = sdata[i];
+        }
+      }
+
+      return data[minIdx];
+      */
     };
 
     // Returns an array of [ts, value] pairs such that for all ts:
