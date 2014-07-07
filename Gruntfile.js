@@ -56,7 +56,7 @@ module.exports = function (grunt) {
       },
       all: [
         'Gruntfile.js',
-        'src/{,*/}*.js'
+        'ts.js'
       ],
       test: {
         options: {
@@ -117,6 +117,19 @@ module.exports = function (grunt) {
     // concat: {
     //   dist: {}
     // },
+    //
+
+    // Watch for build, test and jshint
+    watch: {
+      src: {
+        files : [
+          'src/**/*.js',
+          'Gruntfile.js'
+          ],
+        tasks : [ 'build', 'test:unit', 'jshint' ]
+      }
+    },
+
 
     // Test settings
     karma: {
@@ -167,8 +180,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
-    'test',
-    'build'
+    'build',
+    'watch'
   ]);
 };
