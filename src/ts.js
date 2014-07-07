@@ -24,16 +24,16 @@
       }
       else if( ots instanceof Array ){
         odata = ots;
-        // now ensure that the elements are good:
-        for( i = 0; i < odata.length; ++i ){
-          if( odata[i] instanceof Array ){
-            odata[i][0] = +odata[i][0];
-          }
-          else{
-            alert( 'input must be a valid time series' );
-            return timeSeries;
-          }
-        }
+        //// now ensure that the elements are good:
+        //for( i = 0; i < odata.length; ++i ){
+          //if( odata[i] instanceof Array ){
+            //odata[i][0] = +odata[i][0];
+          //}
+          //else{
+            //alert( 'input must be a valid time series' );
+            //return timeSeries;
+          //}
+        //}
 
         ts_sortTimeSeriesArray( odata );
       }
@@ -113,6 +113,16 @@
         if( i == data.length ){
           args = [i, 0].concat( odata.slice(j) );
           Array.prototype.splice.apply( data, args );
+          break;
+        }
+
+        // Replace existing data:
+        while( i > 1 && i <= odata.length && j < odata.length && data[i-1][0] === odata[j][0] ){
+          data[i-1] = data[j];
+          ++i; ++j;
+        }
+
+        if( i > data.length || j > odata.length ){
           break;
         }
 
@@ -229,17 +239,24 @@
     // Returns an array of [ts, value] pairs such that for all ts:
     // start <= ts < stop
     timeSeries.getValuesInRange = function( start, stop ){
-      var i = 0, j = data.length;
 
-      while( i < data.length && data[i][0] < start ){
-        ++i;
+      if( data.length === 0 ){
+        return [];
       }
 
-      while( j > 1 && data[j-1][0] >= stop ){
-        --j;
+      var i = data.length-1,
+          currT = data[i][0],
+          ret = [];
+
+      while( i >= 0 && (currT = data[i][0]) >= start ){
+        if( currT < stop ){
+          ret.unshift( data[i] );
+        }
+        --i;
       }
 
-      return data.slice(i,j);
+      return ret;
+
     };
 
     // Drop old data
