@@ -1,0 +1,26 @@
+{
+  "name": "ts",
+  "main": "ts.js",
+  "version": "0.0.0",
+  "authors": [
+    "Cillian O'Driscoll <cillian.odriscoll@gmail.com>"
+  ],
+  "description": "Time series utilities for JavaScript",
+  "moduleType": [
+    "amd",
+    "node"
+  ],
+  "keywords": [
+    "time",
+    "series"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
