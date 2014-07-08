@@ -71,7 +71,7 @@
           return start;
         }
 
-        if( timeStamp > t1 ){
+        if( timeStamp >= t1 ){
           return timeSeries.length;
         }
 
@@ -117,8 +117,8 @@
         }
 
         // Replace existing data:
-        while( i > 1 && i <= odata.length && j < odata.length && data[i-1][0] === odata[j][0] ){
-          data[i-1] = data[j];
+        while( i > 1 && i <= data.length && j < odata.length && data[i-1][0] === odata[j][0] ){
+          data[i-1] = odata[j];
           ++i; ++j;
         }
 
