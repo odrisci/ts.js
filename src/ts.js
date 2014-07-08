@@ -110,16 +110,16 @@
         // Now find i: the first index in data which is greater than the first element in odata
         i = firstIndexGreaterThan( data, odata[j][0], i );
 
-        if( i == data.length ){
-          args = [i, 0].concat( odata.slice(j) );
-          Array.prototype.splice.apply( data, args );
-          break;
-        }
-
         // Replace existing data:
         while( i > 1 && i <= data.length && j < odata.length && data[i-1][0] === odata[j][0] ){
           data[i-1] = odata[j];
           ++i; ++j;
+        }
+
+        if( i == data.length ){
+          args = [i, 0].concat( odata.slice(j) );
+          Array.prototype.splice.apply( data, args );
+          break;
         }
 
         if( i > data.length || j > odata.length ){
