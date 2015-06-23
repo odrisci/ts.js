@@ -1,4 +1,4 @@
-/*! ts v0.0.0 - 2015-06-23 
+/*! ts v0.0.1 - 2015-06-23 
  * License: MIT */
 (function(exports){
   var ts = exports.ts = { version : '0.0.0' };
