@@ -1,4 +1,4 @@
-/*! ts v0.0.0 - 2014-07-08 
+/*! ts v0.0.0 - 2015-06-23 
  * License: MIT */
 (function(exports){
   var ts = exports.ts = { version : '0.0.0' };
@@ -113,7 +113,7 @@
         i = firstIndexGreaterThan( data, odata[j][0], i );
 
         // Replace existing data:
-        while( i > 1 && i <= data.length && j < odata.length && data[i-1][0] === odata[j][0] ){
+        while( i > 1 && i < data.length && j < odata.length && data[i-1][0] === odata[j][0] ){
           data[i-1] = odata[j];
           ++i; ++j;
         }
