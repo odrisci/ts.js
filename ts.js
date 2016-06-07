@@ -1,4 +1,4 @@
-/*! ts v0.0.1 - 2015-06-23 
+/*! ts v0.0.1 - 2016-06-07 
  * License: MIT */
 (function(exports){
   var ts = exports.ts = { version : '0.0.0' };
@@ -152,11 +152,11 @@
         return this;
       }
 
-      while( i > 0  && data[i][0] > timeStamp ){
+      while( i > 0  && +data[i][0] > +timeStamp ){
         i--;
       }
 
-      if( data[i][0] === timeStamp ){
+      if( +data[i][0] === +timeStamp ){
         data[i][1] = value; // overwrite old data
       }
       else{
@@ -185,11 +185,11 @@
           t1 = data[stop][0],
           i = 0;
 
-      if( t0 >= timeStamp ){
+      if( +t0 >= +timeStamp ){
         return data[start];
       }
 
-      if( t1 <= timeStamp ){
+      if( +t1 <= +timeStamp ){
         return data[stop];
       }
 
@@ -197,7 +197,7 @@
 
         guess = Math.floor( (start+stop)/2 );
 
-        if( data[guess][0] > timeStamp ){
+        if( +data[guess][0] > +timeStamp ){
           stop = guess;
         }
         else{
@@ -214,7 +214,7 @@
 
       }
 
-      if( Math.abs(timeStamp - t0) > Math.abs(timeStamp - t1) ){
+      if( Math.abs(+timeStamp - t0) > Math.abs(+timeStamp - t1) ){
         guess = stop;
       }
       else{
@@ -246,12 +246,15 @@
         return [];
       }
 
+      var tStart = +start;
+      var tStop = +stop;
+
       var i = data.length-1,
-          currT = data[i][0],
+          currT = +data[i][0],
           ret = [];
 
-      while( i >= 0 && (currT = data[i][0]) >= start ){
-        if( currT < stop ){
+      while( i >= 0 && (currT = +data[i][0]) >= tStart ){
+        if( currT < tStop ){
           ret.unshift( data[i] );
         }
         --i;
@@ -264,8 +267,10 @@
     // Drop old data
     timeSeries.dropDataBefore = function( lastTimeToKeep ){
 
+      var tEnd = +lastTimeToKeep;
+
       var i = 0;
-      while( i < data.length && data[i][0] < lastTimeToKeep ){
+      while( i < data.length && +data[i][0] < tEnd ){
         i++;
       }
 
@@ -273,6 +278,12 @@
 
       return timeSeries;
 
+    };
+
+    // Clear all data:
+    timeSeries.clear = function(){
+      data = [];
+      return timeSeries;
     };
 
     return timeSeries;
